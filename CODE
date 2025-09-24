@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure for patient
+typedef struct Patient {
+    int id;
+    char name[100];
+    int age;
+    struct Patient *left, *right;
+} Patient;
+
+// Function to create a new patient node
+Patient* createPatient(int id, char name[], int age) {
+    Patient* newPatient = (Patient*)malloc(sizeof(Patient));
+    newPatient->id = id;
+    strcpy(newPatient->name, name);
+    newPatient->age = age;
+    newPatient->left = newPatient->right = NULL;
+    return newPatient;
+}
+	
+// Insert patient in BST
+Patient* insertPatient(Patient* root, int id, char name[], int age) {
+    if (root == NULL)
+        return createPatient(id, name, age);
+    if (id < root->id) 
+        root->left = insertPatient(root->left, id, name, age);
+    else if (id > root->id)
+        root->right = insertPatient(root->right, id, name, age);
+    else
+        printf("Patient ID %d already exists.\n", id);
+    return root;
+}
+
+// Inorder traversal to display patients
+void displayPatients(Patient* root) {
+    if (root != NULL) {
+        displayPatients(root->left);
+        printf("ID: %d, Name: %s, Age: %d\n", root->id, root->name, root->age);
+        displayPatients(root->right);
+    }
+}
+
+// Search patient by ID
+Patient* searchPatient(Patient* root, int id) {
+    if (root == NULL || root->id == id)
+        return root;
+    if (id < root->id)
+        return searchPatient(root->left, id);
+    else
+        return searchPatient(root->right, id);
+}
+
+int main() {
+    Patient* root = NULL;
+    int choice, id, age;
+    char name[100];
+
+    while (1) {
+        printf("\nHospital Management System\n");
+        printf("1. Add Patient\n2. Display All Patients\n3. Search Patient by ID\n4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter Patient ID: ");
+            scanf("%d", &id);
+            printf("Enter Patient Name: ");
+            scanf(" %[^\n]%*c", name);
+            printf("Enter Patient Age: ");
+            scanf("%d", &age);
+            root = insertPatient(root, id, name, age);
+            break;
+        case 2:
+            printf("All Patients:\n");
+            displayPatients(root);
+            break;
+        case 3:
+            printf("Enter Patient ID to search: ");
+            scanf("%d", &id);
+            Patient* found = searchPatient(root, id);
+            if (found)
+                printf("Patient Found - ID: %d, Name: %s, Age: %d\n", found->id, found->name, found->age);
+            else
+                printf("Patient with ID %d not found.\n", id);
+            break;
+        case 4:
+            exit(0);
+        default:
+            printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
